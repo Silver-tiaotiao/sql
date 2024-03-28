@@ -239,3 +239,89 @@ ORDER BY vend_name
 WHERE vend_country = 'USA' AND vend_state = 'CA';
 */
 ----------------------------------------------------
+
+----------------------------------------------------
+-- 通配符过滤
+/* 通配符：用来匹配值的一部分的特殊字符 搜索模式：由字面值、通配符或两者组合构成的搜索条件 */
+/* 操作符作为谓词时不是通配符 */
+/* 通配符搜索只能用于字符串（文本字段） 非文本数据类型字段不可以 */
+
+-- LIKE操作符
+
+-- %通配符 表示任意字符出现任意次数
+SELECT prod_id,prod_name
+FROM Products
+WHERE prod_name LIKE 'Fish%';
+/* 搜索以Fish开头的所有产品 */
+/* sql server 搜索不区分大小写 */
+
+SELECT prod_id,prod_name
+FROM Products
+WHERE prod_name LIKE '%bag%';
+
+SELECT prod_id,prod_name
+FROM Products
+WHERE prod_name LIKE 'F%y';
+/* 放中间适合查找邮箱地址 */
+/* %代表搜索模式中给定位置的0个、1个和多个字符 %不匹配NULL */
+/* 请注意用来填补字段的空格 */
+
+-- _通配符 只匹配单个字符
+SELECT prod_id,prod_name
+FROM Products
+WHERE prod_name LIKE '_ inch teddy bear';
+
+SELECT prod_id,prod_name
+FROM Products
+WHERE prod_name LIKE '__ inch teddy bear';
+
+SELECT prod_id,prod_name
+FROM Products
+WHERE prod_name LIKE '% inch teddy bear';
+
+-- []通配符 用来指定一个字符集 必须匹配指定位置的一个字符
+SELECT cust_contact
+FROM Customers
+ORDER BY cust_contact;
+
+SELECT cust_contact
+FROM Customers
+WHERE cust_contact LIKE '[JM]%'
+ORDER BY cust_contact;
+
+SELECT cust_contact
+FROM Customers
+WHERE cust_contact LIKE '[^JM]%'
+ORDER BY cust_contact;
+
+SELECT cust_contact
+FROM Customers
+WHERE NOT cust_contact LIKE '[JM]%'
+ORDER BY cust_contact;
+/* 可以用前缀字符^否定 和 NOT效果相当 */
+----------------------------------------------------
+
+----------------------------------------------------
+-- 6.4
+-- 1
+SELECT prod_name,prod_desc
+FROM Products
+WHERE prod_desc LIKE '%toy%';
+
+-- 2
+SELECT prod_name,prod_desc
+FROM Products
+WHERE NOT prod_desc LIKE '%toy%'
+ORDER BY prod_name;
+
+-- 3
+SELECT prod_name,prod_desc
+FROM Products
+WHERE prod_desc LIKE '%toy%' AND prod_desc LIKE '%carrots%';
+
+-- 4
+SELECT prod_name,prod_desc
+FROM Products
+WHERE prod_desc LIKE '%toy%carrots%';
+----------------------------------------------------
+
