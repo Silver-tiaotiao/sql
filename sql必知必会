@@ -325,3 +325,67 @@ FROM Products
 WHERE prod_desc LIKE '%toy%carrots%';
 ----------------------------------------------------
 
+----------------------------------------------------
+-- 创建计算字段
+/* 
+存储在数据库表中的数据一般不是应用程序所需要的格式 eg. 
+ 需要显示公司名，同时还需要显示公司的地址，但这两个信息存储在不同的表列中。 
+ 城市、州和邮政编码存储在不同的列中（应该这样），但邮件标签打印程序需要把它们作为一个有恰当格式的字段检索出来。 
+ 列数据是大小写混合的，但报表程序需要把所有数据按大写表示出来。 
+ 物品订单表存储物品的价格和数量，不存储每个物品的总价格（用价格乘以数量即可）。但为打印发票，需要物品的总价格。 
+ 需要根据表数据进行诸如总数、平均数的计算。 
+*/
+/* 直接从数据库中检索出转换、计算或格式化过的数据 而不是检索出数据然后再在客户端应用程序中重新格式化 */
+/* 计算字段并不实际存在于数据库表中 是运行时在 SELECT 语句内创建的 
+基本上与列（column）的意思相同 但数据库列一般称为列 而字段这个术语通常在计算字段这种场合下使用 */
+
+-- 拼接字段：+  ||
+SELECT vend_name + '(' + vend_country + ')'
+FROM Vendors
+ORDER BY vend_name;
+/* mysql版
+SELECT Concat(vend_name, ' (', vend_country, ')') 
+FROM Vendors 
+ORDER BY vend_name; 
+*/
+SELECT RTRIM(vend_name) + '(' + RTRIM(vend_country) + ')'
+FROM Vendors
+ORDER BY vend_name;
+/* RTRIM()函数去除值右边的空格 LTRIM()左边的空格 TRIM()左右两边的空格 */
+
+-- 使用别名：用AS关键字赋予新计算列的名字
+SELECT RTRIM(vend_name) + '(' + RTRIM(vend_country) + ')'
+ AS vend_title
+FROM Vendors
+ORDER BY vend_name;
+/* 别名的其他用途：包括在实际的表列名包含不合法的字符（如空格）时重新命名它 在原来的名字含混或容易误解时扩充它 */
+/* 别名既可以是一个单词 也可以是一个字符串（字符串应该括在引号中） */
+/* 别名 = 导出列 */
+
+-- 执行算术计算：+ - * / 
+SELECT prod_id,quantity,item_price 
+FROM OrderItems 
+WHERE order_num = 20008;
+
+SELECT prod_id,quantity,item_price,quantity*item_price AS expanded_price 
+FROM OrderItems 
+WHERE order_num = 20008; 
+/* SELECT 语句为测试、检验函数和计算提供了很好的方法 SELECT省略了FROM子句后就是简单地访问和处理表达式 */
+SELECT 3 * 2
+SELECT TRIM(' abc ');
+SELECT GETDATE()
+/* 使用GETDATE函数返回当前日期和时间 */
+----------------------------------------------------
+
+----------------------------------------------------
+-- 7.5
+-- 1
+SELECT vend_id,vend_name AS vname,vend_address AS vaddress,vend_city AS vcity
+FROM Vendors
+ORDER BY vend_name;
+
+-- 2
+SELECT prod_id,prod_price,prod_price*0.9 AS sale_price
+FROM Products;
+----------------------------------------------------
+
