@@ -547,3 +547,108 @@ FROM Products
 WHERE prod_price <= 10;
 ----------------------------------------------------
 
+----------------------------------------------------
+-- 分组数据
+-- 创建分组 GROUP BY
+SELECT vend_id,COUNT(*) AS num_prods 
+FROM Products 
+GROUP BY vend_id; 
+/* 
+GROUP BY子句可以包含任意数目的列 可以对分组进行嵌套
+在建立分组时 指定的所有列都一起计算（不能从个别的列取回数据）
+GROUP BY子句中列出的每一列都必须是检索列或有效的表达式（但不能是聚集函数）
+如果在SELECT中使用表达式，则必须在GROUP BY子句中指定相同的表达式 不能使用别名
+大多数SQL实现不允许GROUP BY列带有长度可变的数据类型（如文本或备注型字段）
+除聚集计算语句外 SELECT语句中的每一列都必须在 GROUP BY子句中给出
+如果分组列中包含具有NULL值的行 则NULL将作为一个分组返回 如果列中有多行NULL值 它们将分为一组
+GROUP BY子句必须在WHERE子句之后 ORDER BY子句之前
+SQL Server在 GROUP BY中支持可选的ALL子句 这个子句可用来返回所有分组 即使是没有匹配行的分组也返回（在此情况下 聚集将返回NULL）
+*/
+
+-- 过滤分组 HAVING（类似WHERE WHERE过滤行  HAVING过滤分组 WHERE在数据分组前进行过滤 HAVING在数据分组后进行过滤）
+SELECT cust_id,COUNT(*) AS orders 
+FROM Orders 
+GROUP BY cust_id 
+HAVING COUNT(*) >= 2; 
+
+SELECT vend_id, COUNT(*) AS num_prods 
+FROM Products 
+WHERE prod_price >= 4 
+GROUP BY vend_id 
+HAVING COUNT(*) >= 2;
+
+SELECT vend_id, COUNT(*) AS num_prods 
+FROM Products 
+GROUP BY vend_id 
+HAVING COUNT(*) >= 2;
+
+-- 分组和排序
+/*
+ORDER BY 对产生的输出排序 任意列都可以使用
+GROUP BY 对行分组 但输出可能不是分组的顺序 只可能使用选择列或表达式列而且必须使用每个选择列表达式 
+*/
+SELECT order_num,COUNT(*) AS items 
+FROM OrderItems 
+GROUP BY order_num 
+HAVING COUNT(*) >= 3; 
+
+SELECT order_num,COUNT(*) AS items 
+FROM OrderItems 
+GROUP BY order_num 
+HAVING COUNT(*) >= 3 
+ORDER BY items, order_num;
+
+-- SELECT子句顺序
+/*
+SELECT    要返回的列或表达式 是 
+FROM      从中检索数据的表   仅在从表选择数据时使用 
+WHERE     行级过滤           否 
+GROUP BY  分组说明           仅在按组计算聚集时使用 
+HAVING    组级过滤           否 
+ORDER BY  输出排序顺序       否 
+*/
+----------------------------------------------------
+
+----------------------------------------------------
+-- 10.7
+-- 1
+SELECT COUNT(*) AS order_line
+FROM OrderItems
+GROUP BY order_num
+ORDER BY order_line;
+
+-- 2
+SELECT MIN(prod_price) AS cheapest_item
+FROM Products
+GROUP BY vend_id
+ORDER BY cheapest_item;
+
+-- 3
+SELECT order_num
+FROM OrderItems
+GROUP BY order_num
+HAVING SUM(quantity) >= 100;
+
+-- 4
+SELECT order_num
+FROM OrderItems
+GROUP BY order_num
+HAVING SUM(item_price*quantity) >= 1000
+ORDER BY order_num;
+
+-- 5
+SELECT order_num,COUNT(*) AS items 
+FROM OrderItems 
+GROUP BY order_num
+HAVING COUNT(*) >= 3 
+ORDER BY items,order_num; 
+
+/* error版
+SELECT order_num,COUNT(*) AS items 
+FROM OrderItems 
+GROUP BY items 
+HAVING COUNT(*) >= 3 
+ORDER BY items,order_num;
+*/
+----------------------------------------------------
+
