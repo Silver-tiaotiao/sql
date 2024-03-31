@@ -710,14 +710,14 @@ SELECT cust_id
 FROM Orders
 WHERE order_num IN (SELECT order_num
                     FROM OrderItems
-				    WHERE item_price >= 10);
+                    WHERE item_price >= 10);
 
 -- 2
 SELECT cust_id,order_date
 FROM Orders
 WHERE order_num IN (SELECT order_num
                     FROM OrderItems
-					WHERE prod_id = 'BR01')
+		    WHERE prod_id = 'BR01')
 ORDER BY order_date;
 
 -- 3
@@ -727,7 +727,7 @@ WHERE cust_id IN (SELECT cust_id
                   FROM Orders
                   WHERE order_num IN (SELECT order_num
                                       FROM OrderItems
-					                  WHERE prod_id = 'BR01'));
+				      WHERE prod_id = 'BR01'));
 
 -- 4
 SELECT cust_id,(SELECT SUM(item_price*quantity) 
@@ -739,7 +739,7 @@ ORDER BY total_ordered DESC;
 -- 5
 SELECT prod_name,(SELECT SUM(quantity)
                   FROM OrderItems
-				  WHERE orderitems.prod_id = products.prod_id) AS quant_sold
+		  WHERE orderitems.prod_id = products.prod_id) AS quant_sold
 FROM Products;
 ----------------------------------------------------
 
