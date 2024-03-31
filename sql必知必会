@@ -397,7 +397,7 @@ FROM Products;
 数据类型转换：MySQL和SQL Server使用CONVERT() 
 取当前日期：MySQL使用CURDATE() SQL Server使用GETDATE()
 */
-/*  
+/*
 用于处理文本字符串（如删除或填充值 转换值为大写或小写）的文本函数
 用于在数值数据上进行算术操作（如返回绝对值 进行代数运算）的数值函数
 用于处理日期和时间值并从这些值中提取特定成分（如返回两个日期之差 检查日期有效性）的日期和时间函数
@@ -741,5 +741,117 @@ SELECT prod_name,(SELECT SUM(quantity)
                   FROM OrderItems
 		  WHERE orderitems.prod_id = products.prod_id) AS quant_sold
 FROM Products;
+----------------------------------------------------
+
+----------------------------------------------------
+-- 联结表
+/* 关系表以及关系数据库设计 可伸缩性好 能够适应不断增加的工作量而不失败 */
+/* 联结是一种机制：用来在一条SELECT语句中关联表 使用特殊的语法 可以联结多个表返回一组输出 联结在运行时关联表中正确的行 */
+
+-- 创建联结：指定要联结的所有表以及关联它们的方式
+SELECT vend_name,prod_name,prod_price 
+FROM Vendors,Products 
+WHERE Vendors.vend_id = Products.vend_id; 
+/* WHERE子句作为过滤条件：只包含那些匹配给定条件（这里是联结条件）的行 */
+/* 由没有联结条件的表关系返回的结果为笛卡儿积 检索出的行的数目将是第一个表中的行数乘以第二个表中的行数 */
+SELECT vend_name, prod_name, prod_price 
+FROM Vendors, Products;
+/* 没有使用WHERE子句的情况 要保证所有联结都有WHERE子句 同时要保证WHERE子句的正确性 */
+-- 内联结 = 等值联结：基于两个表之间的相等测试
+SELECT vend_name, prod_name, prod_price 
+FROM Vendors 
+INNER JOIN Products ON Vendors.vend_id = Products.vend_id;
+/* 两个表之间的关系是以INNER JOIN指定的部分FROM子句 联结条件用特定的ON子句而不是WHERE子句给出 */
+-- 连接多个表
+SELECT prod_name,vend_name,prod_price,quantity 
+FROM OrderItems,Products,Vendors 
+WHERE Products.vend_id = Vendors.vend_id AND OrderItems.prod_id = Products.prod_id AND order_num = 20007; 
+/* 不要联结不必要的表 联结的表越多性能下降越厉害 */
+/* 子查询 */
+SELECT cust_name,cust_contact 
+FROM Customers 
+WHERE cust_id IN (SELECT cust_id 
+                  FROM Orders 
+                  WHERE order_num IN (SELECT order_num 
+                                      FROM OrderItems 
+                                      WHERE prod_id = 'RGAN01')); 
+/* 联结表 */
+SELECT cust_name,cust_contact 
+FROM Customers,Orders,OrderItems 
+WHERE Customers.cust_id = Orders.cust_id AND OrderItems.order_num = Orders.order_num AND prod_id = 'RGAN01';
+/* 联结的列名相同并不是必需的 */
+----------------------------------------------------
+
+----------------------------------------------------
+-- 12.4
+-- 1
+SELECT cust_name,order_num
+FROM Customers,Orders
+WHERE Customers.cust_id = Orders.cust_id
+ORDER BY cust_name,order_num;
+
+SELECT cust_name,order_num
+FROM Customers
+INNER JOIN Orders ON Customers.cust_id = Orders.cust_id
+ORDER BY cust_name,order_num;
+
+-- 2
+SELECT cust_name,order_num,(SELECT SUM(item_price*quantity) 
+                            FROM OrderItems 
+                            WHERE Orders.order_num = Orderitems.order_num) AS OrderTotal
+FROM Customers
+INNER JOIN Orders ON Customers.cust_id = Orders.cust_id;
+
+SELECT cust_name,Orders.order_num,SUM(item_price*quantity) AS OrderTotal
+FROM Customers
+INNER JOIN Orders ON Customers.cust_id = Orders.cust_id
+INNER JOIN OrderItems ON Orders.order_num = OrderItems.order_num
+GROUP BY cust_name,Orders.order_num;
+/* 这里为什么要用GROUP BY呢 */
+
+-- 3
+/* 11.2
+SELECT cust_id,order_date
+FROM Orders
+WHERE order_num IN (SELECT order_num
+                    FROM OrderItems
+		            WHERE prod_id = 'BR01')
+ORDER BY order_date;
+*/
+SELECT cust_id,order_date
+FROM Orders
+INNER JOIN OrderItems ON prod_id = 'BR01' AND Orders.order_num = OrderItems.order_num
+ORDER BY order_date;
+
+-- 4
+/* 11.3
+SELECT cust_email
+FROM Customers
+WHERE cust_id IN (SELECT cust_id
+                  FROM Orders
+                  WHERE order_num IN (SELECT order_num
+                                      FROM OrderItems
+				                      WHERE prod_id = 'BR01'));
+*/
+SELECT cust_email
+FROM Customers
+INNER JOIN Orders ON Customers.cust_id = Orders.cust_id
+INNER JOIN OrderItems ON Orders.order_num = OrderItems.order_num AND prod_id = 'BR01';
+
+-- 5
+SELECT cust_name,SUM(item_price*quantity) AS OrderTotal 
+FROM Customers
+INNER JOIN Orders ON Customers.cust_id = Orders.cust_id
+INNER JOIN OrderItems ON Orders.order_num = OrderItems.order_num
+GROUP BY cust_name
+HAVING SUM(item_price*quantity) >=1000
+ORDER BY cust_name;
+
+SELECT cust_name,SUM(item_price*quantity) AS OrderTotal 
+FROM Customers,Orders,OrderItems
+WHERE Customers.cust_id = Orders.cust_id AND Orders.order_num = OrderItems.order_num
+GROUP BY cust_name
+HAVING SUM(item_price*quantity) >=1000
+ORDER BY cust_name;
 ----------------------------------------------------
 
