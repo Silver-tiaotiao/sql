@@ -1082,3 +1082,47 @@ WHERE cust_state = 'IL'ORDER BY cust_name;
 */
 ----------------------------------------------------
 
+----------------------------------------------------
+-- 插入数据：INSERT
+/* 将行插入（或添加）到数据库表：插入完整行 插入行的一部分 插入某些查询的结果 */
+
+-- 插入完整行
+INSERT INTO Customers 
+VALUES(1000000006,'Toy Land','123 Any Street','New York','NY','11111','USA',NULL,NULL); 
+/* 简单 但并不安全 高度依赖于表中列的定义次序和其容易获得的次序信息 */
+INSERT INTO Customers(cust_id,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country,cust_contact,cust_email) 
+VALUES(1000000006,'Toy Land','123 Any Street','New York','NY','11111','USA',NULL,NULL); 
+/* 提供了列名 以其指定的次序匹配指定的列名 不一定按各列出现在表中的实际次序 */
+/* 不能插入同一条记录两次 */
+
+-- 插入行的一部分
+/* 提供了列名的情况下可以省略列 只给某些列提供值 其他列不提供值 */
+/* 省略列需要满足条件之一：该列定义为允许 NULL 值（无值或空值） 或 在表定义中给出默认值 */
+
+-- 插入某些查询的结果
+/*
+INSERT INTO Customers(cust_id,cust_contact,cust_email,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country) 
+SELECT cust_id,cust_contact,cust_email,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country 
+FROM CustNew; 
+*/
+/* 从一个名为 CustNew 的表中读出数据并插入到 Customers表 不一定要求列名匹配 通过列名的位置来插入 */
+/* INSERT SELECT中SELECT语句可以包含WHERE子句 以过滤插入的数据 */
+/* 
+INSERT 通常只插入一行
+插入多行 必须执行多个INSERT语句
+INSERT SELECT可以用一条INSERT插入多行
+*/
+
+-- 从一个表复制到另一个表
+/* 将一个表的内容复制到一个全新的表（运行中创建的表） 可以使用CREATE SELECT语句（在SQL Server里也可用SELECT INTO语句） */
+SELECT * INTO CustCopy FROM Customers; 
+/* CREATE TABLE CustCopy AS SELECT * FROM Customers; */
+/* 只复制部分的列：明确给出列名 而不是使用*通配符 */
+/*
+任何SELECT选项和子句都可以使用
+利用联结从多个表插入数据
+不管从多少个表中检索数据都只能插入到一个表中
+*/
+/* 先进行复制 可在复制的数据上测试SQL代码 不会影响实际的数据 */
+----------------------------------------------------
+
