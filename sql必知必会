@@ -1126,3 +1126,46 @@ SELECT * INTO CustCopy FROM Customers;
 /* 先进行复制 可在复制的数据上测试SQL代码 不会影响实际的数据 */
 ----------------------------------------------------
 
+----------------------------------------------------
+-- 更新和删除数据
+-- 更新数据：UPDATE
+/* 更新表中的特定行或更新表中的所有行 */
+/* 
+基本的 UPDATE 语句由三部分组成：
+要更新的表
+列名和它们的新值
+确定要更新哪些行的过滤条件
+*/
+UPDATE Customers 
+SET cust_email = 'kim@thetoystore.com' 
+WHERE cust_id = 1000000005; 
+/* 更新单个列 */
+UPDATE Customers 
+SET cust_contact = 'Sam Roberts',cust_email = 'sam@toyland.com' 
+WHERE cust_id = 1000000006; 
+/* 更新多个列 */
+/* UPDATE语句中可以使用子查询 能用SELECT语句检索出的数据更新列数据 */
+/* 有的SQL实现支持在UPDATE语句中使用FROM子句 用一个表的数据更新另一个表的行 */
+UPDATE Customers 
+SET cust_email = NULL 
+WHERE cust_id = 1000000005; 
+/* 删除某个列的值：设置它为 NULL（假如表定义允许NULL值） */
+/* 空字符串用''表示是一个值 而NULL表示没有值 */
+
+-- 删除数据：DELETE
+/* 删除表中的特定行或删除表中的所有行 */
+DELETE FROM Customers 
+WHERE cust_id = 1000000006; 
+/* DELETE不需要列名或通配符（删除整行而不是删除列） 删除指定的列：请使用UPDATE语句 */
+/* DELETE语句从表中删除行 甚至是删除表中所有行 不删除表本身 */
+/* 从表中删除所有行：TRUNCATE TABLE更快 */
+
+-- 指导原则
+/*
+带WHERE子句 除非确实打算更新/删除每一行 
+保证每个表都有主键（可以指定各主键、多个值或值的范围）
+在UPDATE或DELETE语句使用WHERE子句前 先用SELECT进行测试 保证它过滤的是正确的记录
+使用强制实施引用完整性的数据库 DBMS将不允许删除其数据与其他表相关联的行
+*/
+----------------------------------------------------
+
