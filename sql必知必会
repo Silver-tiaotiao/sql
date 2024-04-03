@@ -1169,3 +1169,88 @@ WHERE cust_id = 1000000006;
 */
 ----------------------------------------------------
 
+----------------------------------------------------
+-- 创建和操纵表
+-- 创建表
+/*
+DBMS自带的交互式创建和管理数据库表的工具
+用SQL语句操纵
+*/
+
+-- 表创建基础
+/* 在关键字CREATE TABLE之后给出新表的名字 表列的名字和定义 用逗号分隔 */
+/*
+CREATE TABLE Products 
+( 
+ prod_id     CHAR(10)       NOT NULL, 
+ vend_id     CHAR(10)       NOT NULL, 
+ prod_name   CHAR(254)      NOT NULL, 
+ prod_price  DECIMAL(8,2)   NOT NULL, 
+ prod_desc   VARCHAR(1000)  NULL 
+); 
+*/
+/* 替换现有的表：需要先删除再重建 */
+/* 使用NULL值：需要规定NULL或NOT NULL（NULL是默认值 如果不指定为NOT NULL会默认NULL） */
+
+-- 指定默认值：DEFAULT
+/*
+CREATE TABLE OrderItems
+(
+  order_num  int          NOT NULL ,
+  order_item int          NOT NULL ,
+  prod_id    char(10)     NOT NULL ,
+  quantity   int          NOT NULL   DEFAULT 1,
+  item_price decimal(8,2) NOT NULL 
+);
+*/
+/* 默认值经常用于日期或时间戳列 eg.通过指定引用系统日期的函数或变量 将系统日期用作默认日期 */
+/* MySQL：DEFAULT CURRENT_ DATE() SQL Server：DEFAULT GETDATE() */
+
+-- 更新表：ALTER TABLE
+/*
+理想情况下 不要在表中包含数据时对其进行更新
+都允许给现有的表增加列 不过对所增加列的数据类型（以及NULL和DEFAULT的使用）有所限制
+许多不允许删除或更改表中的列
+多数允许重新命名表中的列
+许多限制对已经填有数据的列进行更改 对未填有数据的列几乎没有限制
+*/
+/*
+在 ALTER TABLE 之后给出要更改的表名（该表必须存在）
+列出要做哪些更改
+*/
+-- eg.增加列
+ALTER TABLE Vendors 
+ADD vend_phone CHAR(20); 
+-- eg.删除列
+ALTER TABLE Vendors 
+DROP COLUMN vend_phone; 
+
+/* 复杂的表结构更改一般需要手动删除过程： 
+(1) 用新的列布局创建一个新表
+(2) 使用INSERT SELECT语句从旧表复制数据到新表
+(3) 检验包含所需数据的新表
+(4) 重命名旧表（如果确定可以删除它）
+(5) 用旧表原来的名字重命名新表
+(6) 根据需要 重新创建触发器、存储过程、索引和外键
+*/
+/* 使用ALTER TABLE要小心 应在进行改动前做完整的备份（表结构和数据的备份） */
+
+-- 删除表：DROP TABLE
+DROP TABLE CustCopy; 
+
+-- 重命名表
+/* MySQL、Oracle使用RENAME语句 SQL Server使用sp_rename存储过程 */
+----------------------------------------------------
+
+----------------------------------------------------
+-- 17.6
+-- 1
+ALTER TABLE Vendors 
+ADD vend_web CHAR(255); 
+
+-- 2
+UPDATE Vendors 
+SET vend_web = 'sci-hub.se' 
+WHERE vend_id = 'BRS01';
+----------------------------------------------------
+
