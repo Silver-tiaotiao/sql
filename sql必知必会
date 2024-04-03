@@ -1254,3 +1254,93 @@ SET vend_web = 'sci-hub.se'
 WHERE vend_id = 'BRS01';
 ----------------------------------------------------
 
+----------------------------------------------------
+-- 使用视图
+/* 视图是虚拟的表 只包含使用时动态检索数据的查询 */
+SELECT cust_name, cust_contact 
+FROM Customers, Orders, OrderItems 
+WHERE Customers.cust_id = Orders.cust_id AND OrderItems.order_num = Orders.order_num AND prod_id = 'RGAN01'; 
+/* 检索数据 */
+SELECT cust_name, cust_contact 
+FROM ProductCustomers 
+WHERE prod_id = 'RGAN01'; 
+/* 使用视图检索 */
+/* 视图的应用：
+重用SQL语句
+简化复杂的SQL操作 eg.联结
+使用表的一部分而不是整个表
+保护数据 可以授予用户访问表的特定部分的权限
+更改数据格式和表示
+*/
+/* 视图的限制：
+必须唯一命名
+许多禁止在视图查询中使用ORDER BY子句
+视图不能索引 也不能有关联的触发器或默认值
+有些要求对返回的所有列进行命名（列是计算字段需要使用别名）
+可以从视图检索数据 但不能将数据写回底层表
+*/
+
+-- 创建视图：CREATE VIEW
+/* 覆盖/更新视图：先删除（DROP VIEW viewname）再重新创建 */
+
+-- 利用视图简化复杂的联结
+CREATE VIEW ProductCustomers AS 
+SELECT cust_name, cust_contact, prod_id 
+FROM Customers, Orders, OrderItems 
+WHERE Customers.cust_id = Orders.cust_id AND OrderItems.order_num = Orders.order_num;
+/* 利用视图 可一次性编写基础的SQL 然后根据需要多次使用 */
+
+-- 用视图重新格式化检索出的数据
+CREATE VIEW VendorLocations AS 
+SELECT RTRIM(vend_name) + ' (' + RTRIM(vend_country) + ')' AS vend_title 
+FROM Vendors; 
+SELECT * FROM VendorLocations; 
+
+
+-- 用视图过滤不想要的数据
+CREATE VIEW CustomerEMailList AS 
+SELECT cust_id, cust_name, cust_email 
+FROM Customers 
+WHERE cust_email IS NOT NULL;
+
+SELECT * 
+FROM CustomerEMailList; 
+
+-- 使用视图简化计算字段
+CREATE VIEW OrderItemsExpanded AS 
+SELECT order_num,prod_id,quantity,item_price,quantity*item_price AS expanded_price 
+FROM OrderItems;
+
+SELECT * 
+FROM OrderItemsExpanded 
+WHERE order_num = 20008; 
+----------------------------------------------------
+
+----------------------------------------------------
+-- 18.4
+-- 1
+CREATE VIEW CustomersWithOrders AS 
+SELECT Customers.cust_id,cust_name,cust_address,cust_city,cust_state,cust_zip,cust_country,cust_contact,cust_email
+FROM Customers
+INNER JOIN Orders ON Customers.cust_id = Orders.cust_id;
+
+-- 2
+CREATE VIEW OrderItemsExpanded AS 
+SELECT order_num, 
+ prod_id, 
+ quantity, 
+ item_price, 
+ quantity*item_price AS expanded_price 
+FROM OrderItems;
+/* error版
+CREATE VIEW OrderItemsExpanded AS 
+SELECT order_num, 
+ prod_id, 
+ quantity, 
+ item_price, 
+ quantity*item_price AS expanded_price 
+FROM OrderItems 
+ORDER BY order_num; 
+*/
+----------------------------------------------------
+
