@@ -1344,3 +1344,49 @@ ORDER BY order_num;
 */
 ----------------------------------------------------
 
+----------------------------------------------------
+-- 使用存储过程
+-- 存储过程
+/* 简单、安全、高性能 */
+
+-- 创建存储过程
+CREATE PROCEDURE MailingListCount 
+AS 
+DECLARE @cnt INTEGER 
+SELECT @cnt = COUNT(*) 
+FROM Customers 
+WHERE NOT cust_email IS NULL; 
+RETURN @cnt; 
+
+DECLARE @ReturnValue INT 
+EXECUTE @ReturnValue=MailingListCount; 
+SELECT @ReturnValue; 
+
+CREATE PROCEDURE NewOrder @cust_id CHAR(10) 
+AS 
+-- 为订单号声明一个变量 
+DECLARE @order_num INTEGER 
+-- 获取当前最大订单号 
+SELECT @order_num=MAX(order_num) 
+FROM Orders 
+-- 决定下一个订单号 
+SELECT @order_num=@order_num+1 
+-- 插入新订单 
+INSERT INTO Orders(order_num, order_date, cust_id) 
+VALUES(@order_num, GETDATE(), @cust_id) 
+-- 返回订单号 
+RETURN @order_num;
+
+-- 执行存储过程：EXECUTE
+EXECUTE AddNewProduct('JTS01', 
+ 'Stuffed Eiffel Tower', 
+ 6.49, 
+ 'Plush stuffed toy with 
+➥the text La Tour Eiffel in red white and blue');
+/* 以下是存储过程所完成的工作： 
+验证传递的数据 保证所有4个参数都有值
+生成用作主键的唯一ID 
+将新产品插入Products表 在合适的列中存储生成的主键和传递的数据
+*/
+----------------------------------------------------
+
