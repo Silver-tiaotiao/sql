@@ -1441,3 +1441,29 @@ COMMIT TRANSACTION
 /* 保留点越多越好 */
 ----------------------------------------------------
 
+----------------------------------------------------
+-- 使用游标
+-- 游标
+/* 结果集（result set） ：SQL 查询所检索出的结果 */
+/* 游标（cursor）：一个存储在 DBMS 服务器上的数据库查询 是被SELECT语句检索出来的结果集 */
+/*
+在使用游标前必须声明（定义）它 实际上没有检索数据 只是定义要使用的 SELECT 语句和游标选项
+一旦声明 就必须打开游标以供使用 这个过程用前面定义的SELECT语句把数据实际检索出来
+对于填有数据的游标 根据需要取出（检索）各行
+在结束游标使用时 必须关闭游标 可能的话 释放游标
+*/
+
+-- 创建游标：DECLARE
+DECLARE CustCursor CURSOR 
+FOR 
+SELECT * FROM Customers 
+WHERE cust_email IS NULL;
+
+-- 使用游标：OPEN CURSOR
+OPEN CustCursor;
+
+-- 关闭游标：
+CLOSE CustCursor 
+DEALLOCATE CustCursor; 
+----------------------------------------------------
+
